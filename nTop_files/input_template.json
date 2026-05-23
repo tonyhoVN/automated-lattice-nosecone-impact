@@ -1,0 +1,41 @@
+{
+    "description": "",
+    "inputs": [
+        {
+            "description": "Path to file of cad model",
+            "name": "Input Path",
+            "type": "file_path",
+            "value": "d:\\Projects_code\\TopologyNoseCone\\automate_nTop_LSDyna\\CAD_files\\NoseCone.STEP"
+        },
+        {
+            "description": "",
+            "name": "Output Path k file",
+            "type": "file_path",
+            "value": "d:\\Projects_code\\TopologyNoseCone\\automate_nTop_LSDyna\\DYNA_files\\lattice_nose_cone_pre.k"
+        },
+        {
+            "description": "",
+            "name": "Output path STL",
+            "type": "file_path",
+            "value": "d:\\Projects_code\\TopologyNoseCone\\automate_nTop_LSDyna\\CAD_files\\lattice_nose_cone.stl"
+        },
+        {
+            "description": "",
+            "name": "Thickness",
+            "type": "real",
+            "units": "mm",
+            "value": 1.0
+        },
+        {
+            "description": "",
+            "name": "UVW Count",
+            "type": "vector",
+            "value": [
+                4,
+                6,
+                1
+            ]
+        }
+    ],
+    "title": "NoseConeOpt"
+}

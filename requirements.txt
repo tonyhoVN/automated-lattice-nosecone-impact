@@ -1,0 +1,6 @@
+numpy
+matplotlib
+pandas
+jupyter
+ansys-dpf-core
+ansys-dyna-core
