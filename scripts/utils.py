@@ -11,11 +11,8 @@ import subprocess
 
 # Input and output file
 abs_path = os.path.realpath(os.path.join(Path(__file__).resolve(),"..",".."))
-nTOP_path = os.path.join(abs_path, "nTOP_file") 
-dyna_path = os.path.join(abs_path, "DYNA_file")
-input_origin_dir = os.path.join(dyna_path, "system_dyna.k")
-output_modify_dir = os.path.join(dyna_path, "system_dyna_setup.k")
-output_modify_dir = os.path.join(dyna_path, "system_dyna_final.k")
+nTOP_path = os.path.join(abs_path, "nTOP_files") 
+dyna_path = os.path.join(abs_path, "DYNA_files")
 
 BIT_ORDER = [0, 8, 8+16, 8+16*2, 8+16*3]
 
@@ -30,9 +27,6 @@ def make_node_from_line(line:str) -> Node:
     '''
     Take the index of element in line 
     '''
-    # line = line.strip()
-    # line = line.split()
-    # return int(line[2])
     id = int(line[BIT_ORDER[0]:BIT_ORDER[1]])
     x = float(line[BIT_ORDER[1]:BIT_ORDER[2]])
     y = float(line[BIT_ORDER[2]:BIT_ORDER[3]])
@@ -102,7 +96,7 @@ def add_part_id(input_dir: str, output_dir: str, part_name: str, part_id: int):
 
 def get_nodes(input_dir: str):
     """
-    
+    Get nodes in specific nodesets
     """
     startNode = False
     nodes = []
@@ -228,7 +222,7 @@ def add_failure_strain(input_dir: str, output_dir: str, strain_failure:float = 0
     with open(output_dir, "w") as output_file:
         output_file.writelines(lines)
 
-def run_ls_prepost(cfile="merge_nodes.cfile"):
+def run_ls_prepost_cfile(cfile="merge_nodes.cfile"):
     """
     Runs LS-PrePost in batch mode to process a command file (cfile) to merge nodes within a threshold.
     
@@ -256,35 +250,6 @@ def run_ls_prepost(cfile="merge_nodes.cfile"):
         print(f"Error running LS-PrePost: {e}")
     except FileNotFoundError:
         print(f"Executable not found: {exe}. Make sure the path is correct or in your system PATH.")
-
-# def run_dyna(k_file: str, ncpu: int=16, memory: int=200, shell=False, text=False):
-#     """
-#     Call LS-Run for given k_file with number of cpu and memmory
-#     """
-#     run_file_path = os.path.abspath(k_file)
-#     run_file_folder = os.path.abspath(os.path.join(run_file_path,".."))
-
-#     ls_env_setup = r'C:\Program Files\ANSYS Inc\v242\ansys\bin\winx64\lsprepost411\LS-Run\lsdynamsvar.bat'
-#     ls_solver = r'C:\Program Files\ANSYS Inc\v242\ansys\bin\winx64\lsdyna_dp.exe'
-    
-#     # Command for LS Dyna
-#     ls_dyna_command = [ls_env_setup, '&&', ls_solver]
-#     ls_dyna_command.append('i=' + run_file_path)
-#     ls_dyna_command.append('ncpu=' + str(ncpu))
-#     ls_dyna_command.append('memory=' + str(memory) + 'm')
-
-#     try:
-#         subprocess.run(ls_dyna_command, 
-#                        shell=shell, 
-#                        text=text,
-#                        # stdout=subprocess.DEVNULL, 
-#                        # stderr=subprocess.DEVNULL,
-#                        cwd=run_file_folder)
-#         print(f"LS-Dyna executed successfully with command: {' '.join(ls_dyna_command)}")
-#     except subprocess.CalledProcessError as e:
-#         print(f"Error running LS-Dyna: {e}")
-#     except FileNotFoundError:
-#         print(f"Executable not found: {ls_solver}. Make sure the path is correct or in your system PATH.")
 
 def run_dyna(ls_solver: str, k_file: str, run_folder: str, ncpu: int=16, memory: int=200, text=True):
     """
@@ -369,64 +334,7 @@ def HIC_calculation(time: np.ndarray, acc: np.ndarray, duration: int = 15):
         if end_ind < start_ind + 1:
             end_ind = start_ind + 1
 
-    return max_HIC, time_at_max_HIC, index_at_max_HIC, end_ind_at_max_HIC
- 
-# def HIC_calculation(time:np.array, acc: np.array, duration: int=15):
-#     """
-#     calculate HIC with duration of collision (15mm,36ms or infinite -1)
-#     """
-#     # Function to Find first element in array larger than target value 
-#     def find_first_larger(arr, target, start):
-#         left, right = start, len(arr) - 1
-#         result = -1  # Default value if no element is found
-
-#         while left <= right:
-#             mid = (left + right) // 2
-#             if arr[mid] >= target:
-#                 result = mid # Save the best value
-#                 right = mid - 1  # Move left to find the first occurrence
-#             else:
-#                 left = mid + 1  # Move right to continue searching
-
-#         return result
-
-#     # Function to calculate HIC over given period 
-#     def hic_cal(start_ind, end_ind):
-#         area = np.trapz(acc[start_ind:end_ind], time[start_ind:end_ind])
-#         delta_T = time[end_ind] - time[start_ind]
-#         return delta_T*pow((area/delta_T),2.5)
-
-#     # Main loop to calculate max HIC over period
-#     end_period = time[-1]
-#     max_HIC = 0
-#     time_at_max_HIC = time[0]
-#     start_search_ind = 0
-
-#     if duration == -1:
-#         duration = end_period - time[0]
-#     else:
-#         duration /= 1000 # second
-
-#     for current_ind in range(len(time)):
-#         # Check termination condition 
-#         current_time = time[current_ind]
-#         target_time = current_time + duration
-        
-#         if target_time > end_period:
-#             break 
-        
-#         # Find index of element larger than duration
-#         end_period_ind = find_first_larger(time, target_time, start_search_ind)
-#         start_search_ind = end_period_ind
-
-#         # calculate HIC from start_ind to end_ind
-#         hic = hic_cal(start_ind=current_ind,end_ind=end_period_ind)
-
-#         if hic >= max_HIC:
-#             max_HIC = hic 
-#             time_at_max_HIC = current_time
-
-#     return max_HIC, time_at_max_HIC
+    return max_HIC, time_at_max_HIC, index_at_max_HIC, end_ind_at_max_HIC 
 
 def peak_acc_calculate(acc: np.array):
     """

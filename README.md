@@ -42,9 +42,3 @@ Because some paths in the notebooks point to local software installations, users
 - Generated keyword files in [DYNA_files](DYNA_files) can be used as reference examples for expected deck structure.
 - Some notebooks assume that prerequisite files already exist from an earlier step in the workflow.
 - Local executable paths for LS-DYNA, nTop, or related tools may need to be updated before execution.
-
-## Suggested Citation Use
-
-If this repository is shared alongside a publication, it is best described as:
-
-"A workflow for automated lattice generation, LS-DYNA deck construction, impact simulation, and post-processing for lattice nose-cone studies."
